@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#15191D">
+  <title>Audit - NewRAG</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2315191D'/%3E%3Cpath d='M9 11l7-4 7 4v9l-7 4-7-4z' fill='none' stroke='%23D6B25E' stroke-width='2'/%3E%3Ccircle cx='16' cy='15.5' r='2.2' fill='%23D6B25E'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/charts.css">
+  <link rel="stylesheet" href="/static/css/audit.css">
+  <link rel="stylesheet" href="/static/css/arch.css">
+  <script defer src="/static/vendor/marked/marked.umd.js"></script>
+  <script defer src="/static/vendor/dompurify/purify.min.js"></script>
+  <script defer src="/static/vendor/katex/katex.min.js"></script>
+  <script defer src="/static/vendor/katex/contrib/auto-render.min.js"></script>
+  <script type="module" src="/static/js/audit.js"></script>
+</head>
+<body>
+  <header class="hdr">
+    <a class="brand" href="/" aria-label="Back to chat">
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 11l7-4 7 4v9l-7 4-7-4z"/><path d="M9 11l7 4 7-4M16 15v9"/></svg>
+      <span class="brand__name">NewRAG</span>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#usage" class="tab">Usage</a>
+      <a href="#feedback" class="tab">Feedback</a>
+      <a href="#architecture" class="tab">Architecture</a>
+      <a href="#settings" class="tab">Settings</a>
+    </nav>
+    <a class="btn hdr__chat" href="/">Back to chat</a>
+  </header>
+
+  <main class="page">
+    <!-- ============ usage ============ -->
+    <section id="usage" class="sec" aria-labelledby="usage-h">
+      <div class="sec__head">
+        <div>
+          <h1 id="usage-h" class="sec__title">Token usage</h1>
+          <p class="sec__lede">Every model call is logged: routing, answers, memory compaction, titles, grounding checks, feedback reviews, and the local embedder and reranker. Click a bar to filter the call list.</p>
+        </div>
+        <div class="controls">
+          <div class="seg" role="group" aria-label="Time range" id="days">
+            <button type="button" data-days="1" aria-pressed="false">24 h</button>
+            <button type="button" data-days="7" aria-pressed="false">7 days</button>
+            <button type="button" data-days="30" aria-pressed="true">30 days</button>
+            <button type="button" data-days="90" aria-pressed="false">90 days</button>
+          </div>
+          <button type="button" class="btn" id="refresh">Refresh</button>
+        </div>
+      </div>
+
+      <p class="load-error" id="usage-error" role="alert" hidden></p>
+
+      <div class="kpis" id="kpis" aria-live="polite">
+        <div class="kpi"><p class="kpi__label">Total tokens</p><p class="kpi__value num" data-k="total">–</p><p class="kpi__sub num" data-k="total-sub"></p></div>
+        <div class="kpi"><p class="kpi__label">Prompt and completion</p><p class="kpi__value kpi__value--split num"><span data-k="prompt">–</span><span class="kpi__slash">/</span><span data-k="completion">–</span></p>
+          <div class="split" aria-hidden="true"><span class="split__p" data-k="split-p"></span><span class="split__c" data-k="split-c"></span></div></div>
+        <div class="kpi"><p class="kpi__label">Calls</p><p class="kpi__value num" data-k="calls">–</p><p class="kpi__sub num" data-k="calls-sub"></p></div>
+        <div class="kpi"><p class="kpi__label">Average latency</p><p class="kpi__value num" data-k="latency">–</p><p class="kpi__sub" data-k="latency-sub">per call</p></div>
+      </div>
+
+      <div class="panel panel--chart">
+        <div class="panel__bar">
+          <h2 class="panel__title">Tokens per day</h2>
+          <div id="day-legend"></div>
+        </div>
+        <div class="chart" id="day-chart"></div>
+        <details class="chart-table">
+          <summary>Show as table</summary>
+          <table class="tbl" id="day-table"><thead><tr><th scope="col">Day</th><th scope="col" class="r">Prompt</th><th scope="col" class="r">Completion</th><th scope="col" class="r">Total</th><th scope="col" class="r">Calls</th></tr></thead><tbody></tbody></table>
+        </details>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel__bar"><h2 class="panel__title">By purpose</h2><div id="purpose-legend"></div></div>
+          <div class="chart" id="purpose-chart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel__bar"><h2 class="panel__title">By model</h2><div id="model-legend"></div></div>
+          <div class="chart" id="model-chart"></div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel__bar"><h2 class="panel__title">By answer mode</h2></div>
+          <div class="modes" id="mode-cards"></div>
+        </div>
+        <div class="panel">
+          <div class="panel__bar"><h2 class="panel__title">Latency distribution</h2><div id="lat-legend"></div></div>
+          <div class="chart" id="lat-chart"></div>
+          <p class="hint">Calls per duration bucket, from the call log below. Click a bucket to filter.</p>
+        </div>
+      </div>
+
+      <div class="panel">
+        <h2 class="panel__title">Heaviest conversations</h2>
+        <table class="tbl" id="session-table"><thead><tr><th scope="col">Conversation</th><th scope="col" class="r">Tokens</th><th scope="col" class="r">Calls</th><th scope="col" class="r">Avg ms</th></tr></thead><tbody></tbody></table>
+      </div>
+
+      <div class="panel" id="calls-panel">
+        <div class="panel__bar">
+          <h2 class="panel__title">Calls</h2>
+          <div class="filters">
+            <label class="sr-only" for="f-text">Filter calls</label>
+            <input id="f-text" class="input" type="search" placeholder="Filter by session, model, error…">
+            <label class="sr-only" for="f-purpose">Purpose</label>
+            <select id="f-purpose" class="select"><option value="">All purposes</option></select>
+            <label class="sr-only" for="f-mode">Mode</label>
+            <select id="f-mode" class="select"><option value="">All modes</option><option value="swift">Swift</option><option value="deep">Deep</option><option value="none">No mode</option></select>
+            <label class="check"><input type="checkbox" id="f-failed"> Failed only</label>
+          </div>
+        </div>
+        <div class="chips" id="active-filters" aria-live="polite"></div>
+        <div class="tbl-scroll" tabindex="0" role="region" aria-label="Model calls">
+          <table class="tbl tbl--calls" id="calls-table">
+            <thead><tr>
+              <th scope="col" data-sort="created_at" aria-sort="descending"><button type="button">Time</button></th>
+              <th scope="col" data-sort="session_id"><button type="button">Session</button></th>
+              <th scope="col" data-sort="purpose"><button type="button">Purpose</button></th>
+              <th scope="col" data-sort="mode"><button type="button">Mode</button></th>
+              <th scope="col" data-sort="model"><button type="button">Model</button></th>
+              <th scope="col" class="r" data-sort="prompt_tokens"><button type="button">Prompt</button></th>
+              <th scope="col" class="r" data-sort="completion_tokens"><button type="button">Completion</button></th>
+              <th scope="col" class="r" data-sort="total_tokens"><button type="button">Total</button></th>
+              <th scope="col" class="r" data-sort="duration_ms"><button type="button">ms</button></th>
+              <th scope="col" data-sort="ok"><button type="button">OK</button></th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <p class="tbl-foot num" id="calls-foot"></p>
+      </div>
+    </section>
+
+    <!-- ============ feedback ============ -->
+    <section id="feedback" class="sec" aria-labelledby="feedback-h">
+      <div class="sec__head">
+        <div>
+          <h1 id="feedback-h" class="sec__title">Answer feedback</h1>
+          <p class="sec__lede">Likes and dislikes readers gave to answers. A local model can review the disliked answers and classify what went wrong.</p>
+        </div>
+        <div class="controls">
+          <button type="button" class="btn btn--primary" id="fb-review">Review dislikes</button>
+          <button type="button" class="btn" id="fb-refresh">Refresh</button>
+        </div>
+      </div>
+      <p class="load-error" id="fb-error" role="alert" hidden></p>
+
+      <div class="kpis kpis--fb" aria-live="polite">
+        <div class="kpi"><p class="kpi__label">Likes</p><p class="kpi__value num" data-f="likes">–</p></div>
+        <div class="kpi"><p class="kpi__label">Dislikes</p><p class="kpi__value num" data-f="dislikes">–</p></div>
+        <div class="kpi kpi--gauge"><div><p class="kpi__label">Liked share</p><p class="kpi__sub" data-f="ratio-sub"></p></div><div id="fb-gauge"></div></div>
+        <div class="kpi"><p class="kpi__label">Dislikes reviewed</p><p class="kpi__value num" data-f="reviewed">–</p><p class="kpi__sub" data-f="reviewed-sub"></p></div>
+      </div>
+
+      <div class="panel panel--chart">
+        <div class="panel__bar"><h2 class="panel__title">Feedback per day</h2><div id="fb-day-legend"></div></div>
+        <div class="chart" id="fb-day-chart"></div>
+        <p class="hint">Likes above the line, dislikes below. Click a day to list its dislikes.</p>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel__bar"><h2 class="panel__title">By mode</h2></div>
+          <div class="chart" id="fb-mode-chart"></div>
+        </div>
+        <div class="panel">
+          <div class="panel__bar"><h2 class="panel__title">By intent</h2></div>
+          <div class="chart" id="fb-intent-chart"></div>
+        </div>
+      </div>
+
+      <div class="panel panel--chart">
+        <div class="panel__bar"><h2 class="panel__title">Issue types found by the review</h2></div>
+        <div class="chart" id="fb-issue-chart"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__bar">
+          <h2 class="panel__title">Disliked answers <span class="count num" id="fb-count"></span></h2>
+          <div class="filters">
+            <label class="check"><input type="checkbox" id="fb-unreviewed"> Unreviewed only</label>
+          </div>
+        </div>
+        <div class="chips" id="fb-filters" aria-live="polite"></div>
+        <ol class="fb-list" id="fb-list"></ol>
+      </div>
+    </section>
+
+    <!-- ============ architecture ============ -->
+    <section id="architecture" class="sec" aria-labelledby="arch-h">
+      <div class="sec__head">
+        <div>
+          <h1 id="arch-h" class="sec__title">Architecture</h1>
+          <p class="sec__lede">The path one question takes through the pipeline, with live call statistics. Select a step to edit its prompts and parameters; every save is a new version you can diff and roll back.</p>
+        </div>
+        <div class="controls">
+          <label class="sr-only" for="arch-days">Statistics range</label>
+          <select id="arch-days" class="select"><option value="7">Stats: last 7 days</option><option value="30" selected>Stats: last 30 days</option><option value="90">Stats: last 90 days</option></select>
+          <label class="sr-only" for="arch-mode">Mode</label>
+          <select id="arch-mode" class="select"><option value="">All modes</option><option value="swift">Swift only</option><option value="deep">Deep only</option></select>
+          <button type="button" class="btn" id="arch-refresh">Refresh</button>
+        </div>
+      </div>
+      <p class="load-error" id="arch-error" role="alert" hidden></p>
+      <div class="arch">
+        <div class="arch__graph panel">
+          <div class="arch__legend" id="arch-legend"></div>
+          <div id="arch-svg" class="arch__svg"></div>
+          <p class="hint arch__other" id="arch-other" hidden></p>
+        </div>
+        <aside class="arch__side panel" id="arch-side" aria-live="polite">
+          <p class="muted arch__placeholder">Select a step in the diagram to see what it does and edit its versioned components.</p>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ settings ============ -->
+    <section id="settings" class="sec" aria-labelledby="settings-h">
+      <div class="sec__head">
+        <div>
+          <h1 id="settings-h" class="sec__title">Settings</h1>
+          <p class="sec__lede">Runtime settings take effect on the next question. Values saved here override <code>.env</code>.</p>
+        </div>
+      </div>
+      <p class="load-error" id="settings-error" role="alert" hidden></p>
+      <form id="settings-form" class="settings" novalidate>
+        <div id="settings-fields" class="settings__groups"><p class="muted">Loading settings…</p></div>
+        <div class="form-bar">
+          <button type="submit" class="btn btn--primary" id="settings-save">Save settings</button>
+          <button type="button" class="btn" id="settings-reset">Discard changes</button>
+          <p class="form-msg" id="settings-msg" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <dialog class="dlg" id="confirm-dlg" aria-labelledby="confirm-title">
+    <form method="dialog" class="dlg__body">
+      <h2 class="dlg__title" id="confirm-title">Confirm</h2>
+      <p class="dlg__text" id="confirm-text"></p>
+      <div class="form-bar">
+        <button type="submit" class="btn btn--primary" value="ok" id="confirm-ok">Confirm</button>
+        <button type="submit" class="btn" value="cancel" id="confirm-cancel">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

@@ -1,0 +1,50 @@
+# --- PyTorch (GPU) ---------------------------------------------------------
+# Install torch FIRST with the CUDA wheel matching your driver, e.g.:
+#   pip install torch torchvision --index-url https://download.pytorch.org/whl/cu130
+# (CPU-only machines: plain `pip install torch torchvision` works too.)
+torch>=2.14
+torchvision>=0.29
+
+# --- PDF understanding ------------------------------------------------------
+docling[vlm]==2.140.0        # layout, reading order, tables (TableFormer), formula->LaTeX, figure classification
+pymupdf==1.28.2              # native PDF layer: fonts, lines, links, annotations, forms, TOC, metadata
+
+# --- Vision / OCR -----------------------------------------------------------
+transformers==5.20.1         # local vision-language model (Qwen3.5) for image descriptions
+accelerate==1.15.0
+bitsandbytes==0.50.2         # optional 4-bit loading for larger VLMs on small GPUs
+rapidocr==3.10.0             # text-in-image OCR
+onnxruntime==1.31.0          # backend for rapidocr
+opencv-python-headless==5.0.0.93  # QR / barcode decoding, image ops
+pillow>=12.0
+numpy>=2.0
+
+# --- Text utilities ---------------------------------------------------------
+latex2mathml==3.81.1         # LaTeX -> MathML + LaTeX sanity check
+langdetect==1.0.9
+
+# --- Misc -------------------------------------------------------------------
+python-dotenv==1.2.4
+requests==2.34.2             # scraper + optional OpenAI-compatible VLM API
+
+tqdm==4.70.1
+sentence-transformers==6.1.0 # optional torch backend for embeddings / reranking (default: Ollama)
+
+# --- Chat app: API, database, retrieval, LLM ---------------------------------
+fastapi==0.146.0
+uvicorn[standard]==0.54.0
+pgserver==0.1.4              # embedded PostgreSQL 16 + pgvector (no admin install)
+psycopg[binary,pool]==3.3.6
+psycopg-pool==3.3.3
+pgvector==0.5.1
+bm25s[core]==0.3.14          # BM25 side of hybrid retrieval
+PyStemmer==3.1.0
+ollama==0.6.3                # local LLM / embedder / reranker client
+tokenizers==0.23.3           # token counting without importing torch
+pydantic==2.14.1
+httpx==0.28.1
+psutil==7.2.2
+gguf==0.19.0                 # scripts/build_reranker_gguf.py only
+
+# --- Tests --------------------------------------------------------------------
+pytest==9.1.1

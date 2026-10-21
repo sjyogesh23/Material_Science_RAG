@@ -1,0 +1,589 @@
+{
+  "document": {
+    "id": "doc_001",
+    "file_name": "annual_report_2025.pdf",
+    "file_size_bytes": 2483920,
+    "total_pages": 12,
+    "language": "en",
+    "is_scanned": false,
+    "ocr_used": false,
+    "encrypted": false,
+    "pdf_version": "1.7",
+    "extracted_at": "2026-10-18T10:30:00Z",
+    "extractor": { "name": "my-extractor", "version": "1.0.0" },
+    "properties": {
+      "title": "Annual Report 2025",
+      "author": "ACME Corp",
+      "subject": "Financial and operational summary",
+      "keywords": ["finance", "growth", "vehicles"],
+      "creator": "Microsoft Word",
+      "producer": "Adobe PDF Library",
+      "created_date": "2026-01-10",
+      "modified_date": "2026-02-02"
+    },
+    "table_of_contents": [
+      { "title": "1. Introduction", "page": 1, "level": 1 },
+      { "title": "1.1 Background", "page": 1, "level": 2 },
+      { "title": "2. Results", "page": 3, "level": 1 }
+    ]
+  },
+
+  "pages": [
+    {
+      "page_number": 1,
+      "width": 595.0,
+      "height": 842.0,
+      "unit": "pt",
+      "rotation": 0,
+      "layout": { "columns": 2, "orientation": "portrait" },
+
+      "elements": [
+        {
+          "id": "p1_e1",
+          "type": "header",
+          "content": "ACME Corp | Annual Report 2025",
+          "metadata": {
+            "page": 1,
+            "region": "top",
+            "repeats_on_pages": "all",
+            "bbox": [40, 20, 555, 45],
+            "reading_order": 0,
+            "confidence": 0.99
+          }
+        },
+
+        {
+          "id": "p1_e2",
+          "type": "text",
+          "category": "title",
+          "content": "Annual Report 2025",
+          "metadata": {
+            "page": 1,
+            "line_start": 1,
+            "line_end": 1,
+            "paragraph_index": 1,
+            "side": "center",
+            "column": null,
+            "bbox": [100, 80, 495, 130],
+            "reading_order": 1,
+            "section_path": [],
+            "parent_id": null,
+            "font": { "name": "Arial-Bold", "size": 28, "bold": true, "italic": false, "underline": false, "color": "#000000" },
+            "alignment": "center",
+            "language": "en",
+            "confidence": 0.99
+          }
+        },
+
+        {
+          "id": "p1_e3",
+          "type": "text",
+          "category": "subtitle",
+          "content": "Growth, Innovation and Sustainability",
+          "metadata": {
+            "page": 1,
+            "line_start": 2,
+            "line_end": 2,
+            "paragraph_index": 2,
+            "side": "center",
+            "column": null,
+            "bbox": [100, 135, 495, 160],
+            "reading_order": 2,
+            "section_path": [],
+            "parent_id": "p1_e2",
+            "font": { "name": "Arial", "size": 16, "bold": false, "italic": true, "underline": false, "color": "#444444" },
+            "alignment": "center",
+            "confidence": 0.98
+          }
+        },
+
+        {
+          "id": "p1_e4",
+          "type": "text",
+          "category": "heading",
+          "heading_level": 1,
+          "content": "1. Introduction",
+          "metadata": {
+            "page": 1,
+            "line_start": 5,
+            "line_end": 5,
+            "paragraph_index": 3,
+            "side": "left",
+            "column": 1,
+            "bbox": [40, 200, 280, 225],
+            "reading_order": 3,
+            "section_path": ["1. Introduction"],
+            "parent_id": null,
+            "font": { "name": "Arial-Bold", "size": 18, "bold": true },
+            "confidence": 0.99
+          }
+        },
+
+        {
+          "id": "p1_e5",
+          "type": "text",
+          "category": "description",
+          "content": "This report summarizes the financial and operational performance of ACME Corp during 2025. It covers revenue growth, product launches and sustainability goals.",
+          "metadata": {
+            "page": 1,
+            "line_start": 7,
+            "line_end": 10,
+            "paragraph_index": 4,
+            "side": "left",
+            "column": 1,
+            "bbox": [40, 235, 280, 320],
+            "reading_order": 4,
+            "section_path": ["1. Introduction"],
+            "parent_id": "p1_e4",
+            "font": { "name": "Times-Roman", "size": 11, "bold": false },
+            "word_count": 24,
+            "char_count": 158,
+            "language": "en",
+            "has_hyperlinks": false,
+            "confidence": 0.97
+          }
+        },
+
+        {
+          "id": "p1_e6",
+          "type": "list",
+          "list_type": "bulleted",
+          "items": [
+            { "index": 1, "text": "Revenue increased by 15%", "level": 1 },
+            { "index": 2, "text": "Three new vehicle models launched", "level": 1 },
+            { "index": 3, "text": "Carbon emissions reduced by 8%", "level": 1 }
+          ],
+          "metadata": {
+            "page": 1,
+            "line_start": 12,
+            "line_end": 14,
+            "paragraph_index": 5,
+            "side": "left",
+            "column": 1,
+            "bbox": [40, 330, 280, 400],
+            "reading_order": 5,
+            "section_path": ["1. Introduction"],
+            "parent_id": "p1_e4",
+            "confidence": 0.95
+          }
+        },
+
+        {
+          "id": "p1_e7",
+          "type": "image",
+          "category": "photo",
+          "image_file": "images/p1_e7.png",
+          "format": "png",
+          "width_px": 800,
+          "height_px": 450,
+          "dpi": 150,
+          "description": "A red sports car with license plate 'DADADA' parked on a wet road in front of a glass office building during sunset.",
+          "short_caption": "Red car with plate DADADA",
+          "objects_detected": [
+            { "label": "car", "color": "red", "confidence": 0.98, "bbox_in_image": [120, 180, 640, 400] },
+            { "label": "building", "color": "gray", "confidence": 0.91, "bbox_in_image": [0, 0, 800, 300] },
+            { "label": "license_plate", "confidence": 0.9, "bbox_in_image": [350, 360, 450, 390] }
+          ],
+          "dominant_colors": ["#B71C1C", "#37474F", "#FFB74D"],
+          "text_in_image": [
+            {
+              "text": "DADADA",
+              "role": "license_plate",
+              "bbox_in_image": [350, 360, 450, 390],
+              "language": "en",
+              "confidence": 0.93
+            },
+            {
+              "text": "ACME MOTORS",
+              "role": "signboard",
+              "bbox_in_image": [500, 40, 780, 90],
+              "language": "en",
+              "confidence": 0.95
+            }
+          ],
+          "has_text": true,
+          "caption": {
+            "text": "Figure 1: The new ACME Roadster",
+            "figure_number": "Figure 1",
+            "linked_element_id": "p1_e8"
+          },
+          "alt_text": "Red sports car on a street",
+          "metadata": {
+            "page": 1,
+            "side": "right",
+            "column": 2,
+            "bbox": [300, 200, 555, 340],
+            "reading_order": 6,
+            "section_path": ["1. Introduction"],
+            "parent_id": "p1_e4",
+            "is_inline": false,
+            "is_background": false,
+            "is_logo": false,
+            "has_transparency": false,
+            "rotation": 0,
+            "confidence": 0.94
+          }
+        },
+
+        {
+          "id": "p1_e8",
+          "type": "text",
+          "category": "caption",
+          "content": "Figure 1: The new ACME Roadster",
+          "metadata": {
+            "page": 1,
+            "line_start": 8,
+            "line_end": 8,
+            "side": "right",
+            "column": 2,
+            "bbox": [300, 345, 555, 360],
+            "reading_order": 7,
+            "caption_for": "p1_e7",
+            "confidence": 0.97
+          }
+        },
+
+        {
+          "id": "p1_e9",
+          "type": "footnote",
+          "marker": "1",
+          "content": "All figures are in USD unless stated otherwise.",
+          "metadata": {
+            "page": 1,
+            "region": "bottom",
+            "bbox": [40, 770, 555, 785],
+            "references_element_id": "p1_e5",
+            "reading_order": 8,
+            "confidence": 0.96
+          }
+        },
+
+        {
+          "id": "p1_e10",
+          "type": "footer",
+          "content": "Page 1 of 12",
+          "metadata": {
+            "page": 1,
+            "region": "bottom",
+            "bbox": [250, 810, 345, 830],
+            "page_number_label": "1",
+            "reading_order": 9,
+            "confidence": 0.99
+          }
+        }
+      ]
+    },
+
+    {
+      "page_number": 3,
+      "width": 595.0,
+      "height": 842.0,
+      "unit": "pt",
+      "rotation": 0,
+      "layout": { "columns": 1, "orientation": "portrait" },
+
+      "elements": [
+        {
+          "id": "p3_e1",
+          "type": "text",
+          "category": "heading",
+          "heading_level": 1,
+          "content": "2. Results",
+          "metadata": {
+            "page": 3,
+            "line_start": 1,
+            "line_end": 1,
+            "paragraph_index": 1,
+            "side": "full_width",
+            "column": 1,
+            "bbox": [40, 60, 555, 90],
+            "reading_order": 1,
+            "section_path": ["2. Results"],
+            "confidence": 0.99
+          }
+        },
+
+        {
+          "id": "p3_e2",
+          "type": "formula",
+          "formula_type": "display",
+          "latex": "\\text{ROI} = \\frac{\\text{Net Profit}}{\\text{Cost of Investment}} \\times 100",
+          "plain_text": "ROI = Net Profit / Cost of Investment x 100",
+          "mathml": "<math><mi>ROI</mi><mo>=</mo><mfrac><mtext>Net Profit</mtext><mtext>Cost of Investment</mtext></mfrac><mo>×</mo><mn>100</mn></math>",
+          "equation_number": "(1)",
+          "variables": [
+            { "symbol": "ROI", "meaning": "Return on Investment" }
+          ],
+          "image_file": "formulas/p3_e2.png",
+          "metadata": {
+            "page": 3,
+            "line_start": 6,
+            "line_end": 7,
+            "paragraph_index": 3,
+            "side": "full_width",
+            "column": 1,
+            "bbox": [150, 200, 450, 250],
+            "reading_order": 3,
+            "section_path": ["2. Results"],
+            "parent_id": "p3_e1",
+            "referenced_in_text": ["p3_e5"],
+            "confidence": 0.9
+          }
+        },
+
+        {
+          "id": "p3_e3",
+          "type": "formula",
+          "formula_type": "inline",
+          "latex": "E = mc^2",
+          "plain_text": "E = mc^2",
+          "metadata": {
+            "page": 3,
+            "line_start": 9,
+            "inline_in_element": "p3_e4",
+            "char_offset_start": 45,
+            "char_offset_end": 53,
+            "confidence": 0.95
+          }
+        },
+
+        {
+          "id": "p3_e4",
+          "type": "text",
+          "category": "description",
+          "content": "Profit is related to energy output as shown by E = mc^2 in the technical appendix.",
+          "contains_inline_formulas": ["p3_e3"],
+          "metadata": {
+            "page": 3,
+            "line_start": 9,
+            "line_end": 10,
+            "paragraph_index": 4,
+            "side": "full_width",
+            "column": 1,
+            "bbox": [40, 260, 555, 295],
+            "reading_order": 4,
+            "section_path": ["2. Results"],
+            "confidence": 0.96
+          }
+        },
+
+        {
+          "id": "p3_e5",
+          "type": "table",
+          "title": "Quarterly Sales (in USD)",
+          "caption": "Table 1: Quarterly sales by region",
+          "num_rows": 3,
+          "num_columns": 4,
+          "has_header_row": true,
+          "has_header_column": true,
+          "headers": ["Region", "Q1", "Q2", "Q3"],
+          "rows": [
+            { "row_index": 1, "cells": { "Region": "North", "Q1": "12000", "Q2": "15000", "Q3": "18000" } },
+            { "row_index": 2, "cells": { "Region": "South", "Q1": "9000",  "Q2": "11000", "Q3": "13500" } },
+            { "row_index": 3, "cells": { "Region": "Total", "Q1": "21000", "Q2": "26000", "Q3": "31500" } }
+          ],
+          "cells": [
+            {
+              "row": 0, "column": 0, "row_span": 1, "col_span": 1,
+              "text": "Region", "is_header": true, "data_type": "string",
+              "bbox": [40, 320, 160, 345], "bold": true, "background_color": "#EEEEEE"
+            },
+            {
+              "row": 1, "column": 1, "row_span": 1, "col_span": 1,
+              "text": "12000", "is_header": false, "data_type": "number",
+              "unit": "USD", "bbox": [160, 345, 260, 370]
+            }
+          ],
+          "merged_cells": [],
+          "footer_rows": [
+            { "row_index": 3, "type": "total" }
+          ],
+          "notes": "Q3 figures are preliminary.",
+          "csv_preview": "Region,Q1,Q2,Q3\nNorth,12000,15000,18000\nSouth,9000,11000,13500\nTotal,21000,26000,31500",
+          "markdown_preview": "| Region | Q1 | Q2 | Q3 |\n|---|---|---|---|\n| North | 12000 | 15000 | 18000 |\n| South | 9000 | 11000 | 13500 |\n| Total | 21000 | 26000 | 31500 |",
+          "table_type": "bordered",
+          "continues_from_previous_page": false,
+          "continues_on_next_page": false,
+          "metadata": {
+            "page": 3,
+            "side": "full_width",
+            "column": 1,
+            "bbox": [40, 320, 555, 420],
+            "reading_order": 5,
+            "section_path": ["2. Results"],
+            "parent_id": "p3_e1",
+            "confidence": 0.92
+          }
+        },
+
+        {
+          "id": "p3_e6",
+          "type": "chart",
+          "chart_type": "bar",
+          "title": "Sales by Region",
+          "description": "A bar chart comparing sales in North and South regions across three quarters. North leads in every quarter.",
+          "x_axis": { "label": "Quarter", "values": ["Q1", "Q2", "Q3"] },
+          "y_axis": { "label": "Sales (USD)", "min": 0, "max": 20000 },
+          "series": [
+            { "name": "North", "color": "#1E88E5", "data": [12000, 15000, 18000] },
+            { "name": "South", "color": "#43A047", "data": [9000, 11000, 13500] }
+          ],
+          "legend": ["North", "South"],
+          "text_in_image": ["Sales by Region", "Q1", "Q2", "Q3"],
+          "image_file": "charts/p3_e6.png",
+          "metadata": {
+            "page": 3,
+            "side": "full_width",
+            "bbox": [60, 440, 535, 700],
+            "reading_order": 6,
+            "section_path": ["2. Results"],
+            "confidence": 0.85
+          }
+        },
+
+        {
+          "id": "p3_e7",
+          "type": "code_block",
+          "language": "python",
+          "content": "def roi(profit, cost):\n    return profit / cost * 100",
+          "metadata": {
+            "page": 3,
+            "line_start": 40,
+            "line_end": 41,
+            "bbox": [40, 710, 555, 760],
+            "reading_order": 7,
+            "confidence": 0.93
+          }
+        },
+
+        {
+          "id": "p3_e8",
+          "type": "quote",
+          "content": "Growth is never by mere chance; it is the result of forces working together.",
+          "attribution": "James Cash Penney",
+          "metadata": {
+            "page": 3,
+            "side": "right",
+            "bbox": [300, 770, 555, 800],
+            "reading_order": 8,
+            "confidence": 0.9
+          }
+        },
+
+        {
+          "id": "p3_e9",
+          "type": "sidebar",
+          "title": "Did you know?",
+          "content": "ACME produced its 1 millionth vehicle in 2025.",
+          "metadata": {
+            "page": 3,
+            "side": "right",
+            "bbox": [420, 90, 555, 190],
+            "background_color": "#FFF9C4",
+            "reading_order": 2,
+            "confidence": 0.88
+          }
+        }
+      ]
+    },
+
+    {
+      "page_number": 12,
+      "elements": [
+        {
+          "id": "p12_e1",
+          "type": "text",
+          "category": "reference",
+          "content": "[1] Smith, J. (2024). Electric Mobility Trends. Journal of Transport, 12(3), 45-60.",
+          "parsed_reference": {
+            "authors": ["Smith, J."],
+            "year": 2024,
+            "title": "Electric Mobility Trends",
+            "journal": "Journal of Transport",
+            "volume": "12",
+            "issue": "3",
+            "pages": "45-60",
+            "doi": null
+          },
+          "metadata": { "page": 12, "line_start": 3, "side": "left", "column": 1, "bbox": [40, 100, 555, 130], "reading_order": 1 }
+        },
+        {
+          "id": "p12_e2",
+          "type": "link",
+          "text": "www.acme.com",
+          "url": "https://www.acme.com",
+          "link_type": "external",
+          "metadata": { "page": 12, "line_start": 8, "bbox": [40, 200, 160, 215] }
+        },
+        {
+          "id": "p12_e3",
+          "type": "signature",
+          "description": "Handwritten signature",
+          "signer_name_text": "John Doe, CEO",
+          "image_file": "images/p12_e3.png",
+          "metadata": { "page": 12, "side": "right", "bbox": [380, 600, 540, 660] }
+        },
+        {
+          "id": "p12_e4",
+          "type": "stamp",
+          "description": "Circular blue stamp reading 'APPROVED'",
+          "text_in_image": ["APPROVED", "ACME CORP"],
+          "metadata": { "page": 12, "bbox": [60, 580, 160, 680] }
+        },
+        {
+          "id": "p12_e5",
+          "type": "watermark",
+          "content": "CONFIDENTIAL",
+          "metadata": { "page": 12, "applies_to_pages": "all", "opacity": 0.2, "rotation": 45 }
+        },
+        {
+          "id": "p12_e6",
+          "type": "barcode",
+          "code_type": "QR",
+          "decoded_value": "https://www.acme.com/report",
+          "metadata": { "page": 12, "bbox": [480, 740, 555, 815] }
+        },
+        {
+          "id": "p12_e7",
+          "type": "form_field",
+          "field_type": "checkbox",
+          "label": "I agree to the terms",
+          "value": true,
+          "metadata": { "page": 12, "bbox": [40, 700, 60, 720] }
+        },
+        {
+          "id": "p12_e8",
+          "type": "annotation",
+          "annotation_type": "comment",
+          "author": "Reviewer 1",
+          "content": "Please verify this number.",
+          "created": "2026-01-15T09:00:00Z",
+          "metadata": { "page": 12, "bbox": [300, 100, 320, 120], "linked_element_id": "p12_e1" }
+        }
+      ]
+    }
+  ],
+
+  "relationships": [
+    { "from": "p1_e7", "to": "p1_e8", "type": "has_caption" },
+    { "from": "p3_e5", "to": "p3_e2", "type": "uses_formula" },
+    { "from": "p1_e9", "to": "p1_e5", "type": "footnote_of" },
+    { "from": "p3_e4", "to": "p3_e3", "type": "contains_inline_formula" },
+    { "from": "p12_e8", "to": "p12_e1", "type": "annotates" }
+  ],
+
+  "summary": {
+    "total_elements": 31,
+    "counts_by_type": {
+      "text": 7, "list": 1, "image": 1, "formula": 2, "table": 1, "chart": 1,
+      "code_block": 1, "quote": 1, "sidebar": 1, "footnote": 1,
+      "header": 1, "footer": 1, "link": 1, "signature": 1, "stamp": 1,
+      "watermark": 1, "barcode": 1, "form_field": 1, "annotation": 1
+    },
+    "warnings": [
+      "Formula p3_e2 confidence below 0.95, please verify",
+      "Chart p3_e6 data values are estimated from the image"
+    ],
+    "processing_time_ms": 4820
+  }
+}

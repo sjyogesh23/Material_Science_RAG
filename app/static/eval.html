@@ -1,0 +1,270 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#15191D">
+  <title>Evaluation - NewRAG</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%2315191D'/%3E%3Cpath d='M9 11l7-4 7 4v9l-7 4-7-4z' fill='none' stroke='%23D6B25E' stroke-width='2'/%3E%3Ccircle cx='16' cy='15.5' r='2.2' fill='%23D6B25E'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/vendor/katex/katex.min.css">
+  <link rel="stylesheet" href="/static/css/base.css">
+  <link rel="stylesheet" href="/static/css/audit.css">
+  <link rel="stylesheet" href="/static/css/charts.css">
+  <link rel="stylesheet" href="/static/css/eval.css">
+  <script defer src="/static/vendor/marked/marked.umd.js"></script>
+  <script defer src="/static/vendor/dompurify/purify.min.js"></script>
+  <script defer src="/static/vendor/katex/katex.min.js"></script>
+  <script defer src="/static/vendor/katex/contrib/auto-render.min.js"></script>
+  <script type="module" src="/static/js/eval.js"></script>
+</head>
+<body>
+  <header class="hdr">
+    <a class="brand" href="/" aria-label="Back to chat">
+      <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M9 11l7-4 7 4v9l-7 4-7-4z"/><path d="M9 11l7 4 7-4M16 15v9"/></svg>
+      <span class="brand__name">NewRAG</span>
+    </a>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#runs" class="tab">Runs</a>
+      <a href="#matrix" class="tab">Matrix</a>
+      <a href="#charts" class="tab">Charts</a>
+      <a href="#items" class="tab">Items</a>
+    </nav>
+    <a class="btn" href="/audit">Audit</a>
+    <a class="btn hdr__chat" href="/">Back to chat</a>
+  </header>
+
+  <main class="page">
+    <!-- ============ runs ============ -->
+    <section id="runs" class="sec" aria-labelledby="runs-h">
+      <div class="sec__head">
+        <div>
+          <h1 id="runs-h" class="sec__title">Evaluation</h1>
+          <p class="sec__lede">Each run sends the question bank through the real pipeline; a stronger local model then grades every answer against gold facts from the textbook. Pick a run to see its matrix, or two runs to compare them.</p>
+        </div>
+        <div class="controls">
+          <button type="button" class="btn" id="refresh">Refresh</button>
+          <button type="button" class="btn btn--primary" id="new-run-toggle" aria-expanded="false" aria-controls="new-run">Start run</button>
+        </div>
+      </div>
+      <p class="load-error" id="runs-error" role="alert" hidden></p>
+
+      <form class="panel newrun" id="new-run" hidden novalidate>
+        <h2 class="panel__title">New evaluation run</h2>
+        <div class="newrun__grid">
+          <div class="field">
+            <label for="nr-label">Label</label>
+            <input id="nr-label" class="input" required maxlength="80" placeholder="baseline" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="nr-limit">Limit <span class="opt">(optional)</span></label>
+            <input id="nr-limit" class="input" type="number" min="1" max="1000" placeholder="all">
+          </div>
+          <div class="field field--wide">
+            <span class="label" id="nr-sc-label">Scenarios <span class="opt">(none ticked = all)</span></span>
+            <div class="chips" id="nr-scenarios" role="group" aria-labelledby="nr-sc-label"></div>
+          </div>
+          <label class="check field--wide"><input type="checkbox" id="nr-judge"> Judge right after answering</label>
+        </div>
+        <p class="hint">Runs in the background in its own process (about 30 s per question). Judging unloads the chat models and loads the judge model, so the chat is slow while it runs.</p>
+        <div class="form-bar">
+          <button type="submit" class="btn btn--primary" id="nr-submit">Start</button>
+          <button type="button" class="btn" id="nr-cancel">Cancel</button>
+          <p class="form-msg" id="nr-msg" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+
+      <div class="panel job" id="job" hidden aria-live="polite">
+        <div class="panel__bar">
+          <h2 class="panel__title" id="job-title">Running</h2>
+          <button type="button" class="btn btn--danger" id="job-cancel">Stop after current item</button>
+        </div>
+        <div class="progress" aria-hidden="true"><span id="job-bar"></span></div>
+        <p class="job__meta num" id="job-meta"></p>
+        <pre class="job__log" id="job-log" tabindex="0" aria-label="Job log"></pre>
+      </div>
+
+      <div class="tbl-scroll tbl-scroll--runs" tabindex="0" role="region" aria-label="Evaluation runs">
+        <table class="tbl tbl--runs" id="runs-table">
+          <thead><tr>
+            <th scope="col"><span class="sr-only">Compare</span></th>
+            <th scope="col">Run</th>
+            <th scope="col">Status</th>
+            <th scope="col" class="r">Items</th>
+            <th scope="col" class="r">Judged</th>
+            <th scope="col" class="r">Score</th>
+            <th scope="col" class="r">Pass</th>
+            <th scope="col" class="r">OOC F1</th>
+            <th scope="col" class="r">p50 latency</th>
+            <th scope="col">Judge</th>
+            <th scope="col">Created</th>
+            <th scope="col"><span class="sr-only">Actions</span></th>
+          </tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+      <p class="tbl-foot" id="runs-foot">Tick two runs to compare them.</p>
+    </section>
+
+    <!-- ============ matrix ============ -->
+    <section id="matrix" class="sec" aria-labelledby="matrix-h">
+      <div class="sec__head">
+        <div>
+          <h1 id="matrix-h" class="sec__title">Matrix</h1>
+          <p class="sec__lede" id="matrix-lede">Select a run above.</p>
+        </div>
+        <div class="controls">
+          <div class="seg" role="radiogroup" aria-label="Matrix view" id="view-seg">
+            <button type="button" role="radio" aria-checked="true" data-view="scores">Scores</button>
+            <button type="button" role="radio" aria-checked="false" data-view="delta" disabled>Change vs other run</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="kpis kpis--5" id="kpis">
+        <div class="kpi"><p class="kpi__label">Overall score</p><p class="kpi__value num" data-k="score">–</p><p class="kpi__sub num" data-k="score-sub"></p></div>
+        <div class="kpi"><p class="kpi__label">Pass rate</p><p class="kpi__value num" data-k="pass">–</p><p class="kpi__sub num" data-k="pass-sub"></p></div>
+        <div class="kpi"><p class="kpi__label">Out-of-context F1</p><p class="kpi__value num" data-k="ooc">–</p><p class="kpi__sub num" data-k="ooc-sub"></p></div>
+        <div class="kpi"><p class="kpi__label">Retrieval hit@k</p><p class="kpi__value num" data-k="hit">–</p><p class="kpi__sub num" data-k="hit-sub"></p></div>
+        <div class="kpi"><p class="kpi__label">Latency p50 / p95</p><p class="kpi__value kpi__value--split num" data-k="lat">–</p><p class="kpi__sub num" data-k="lat-sub"></p></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel__bar">
+          <h2 class="panel__title" id="heat-title">Scenario × metric</h2>
+          <div class="scale" id="heat-legend" aria-hidden="true"></div>
+        </div>
+        <div class="heat-wrap" tabindex="0" role="region" aria-label="Scenario by metric matrix">
+          <table class="heat" id="heat"></table>
+        </div>
+        <p class="tbl-foot">Scores are judge means on a 1–5 scale; rates are percentages. A dash means the metric does not apply. Select a row to see its questions; hover a cell for details.</p>
+        <details class="chart-table" id="metric-defs"><summary>Metric definitions</summary><dl class="defs" id="defs"></dl></details>
+      </div>
+
+      <div class="panel" id="conf-panel">
+        <div class="panel__bar">
+          <h2 class="panel__title">Classification checks</h2>
+          <p class="hint" id="conf-hint">Expected (rows) vs what the system did (columns). Select a cell to list its questions.</p>
+        </div>
+        <div class="conf-grid" id="conf-grid"><p class="muted">Select a run above.</p></div>
+        <div class="conf-items" id="conf-items" hidden aria-live="polite"></div>
+        <details class="chart-table"><summary>How these are computed</summary>
+          <dl class="defs">
+            <dt>Per class</dt><dd>Precision = correct predictions of the class / all predictions of it; recall = correct / all gold items of it; F1 = their harmonic mean; support = gold items of the class. Both classes of each matrix are scored (the negative class uses TN as its hits).</dd>
+            <dt>Micro</dt><dd>Pooled over both classes: total correct / total items. For a single-label yes/no decision micro precision = recall = F1 = accuracy.</dd>
+            <dt>Macro</dt><dd>Unweighted mean over the classes that occur in the gold labels, so the rare class (e.g. 14 out-of-context items of 90) counts as much as the common one. A class that is never predicted counts as precision 0.</dd>
+            <dt>Weighted</dt><dd>Mean over classes weighted by support.</dd>
+          </dl>
+        </details>
+      </div>
+
+      <div class="panel" id="avg-panel">
+        <div class="panel__bar">
+          <h2 class="panel__title">Micro vs macro averages</h2>
+          <p class="hint">Micro = mean over items (big scenarios weigh more). Macro = mean of the per-scenario means (each scenario counts once).</p>
+        </div>
+        <div class="tbl-scroll" tabindex="0" role="region" aria-label="Micro and macro averages">
+          <table class="tbl tbl--avg" id="avg-table"></table>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="panel">
+          <h2 class="panel__title">Judge</h2>
+          <div id="judge-info" class="judge-info"><p class="muted">Not judged yet.</p></div>
+        </div>
+        <div class="panel">
+          <h2 class="panel__title">Robustness</h2>
+          <div id="robust-info" class="judge-info"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ charts ============ -->
+    <section id="charts" class="sec" aria-labelledby="charts-h">
+      <div class="sec__head">
+        <div>
+          <h1 id="charts-h" class="sec__title">Charts</h1>
+          <p class="sec__lede" id="charts-lede">Tick a second run in the table to overlay it. Hover for values; select a bar or point to drill down.</p>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel__bar"><h2 class="panel__title">Score by scenario</h2><div id="lg-scen"></div></div>
+          <div class="ev-chart" id="ch-scen"></div>
+          <p class="tbl-foot">Item score 0–100 per scenario; the right column is the change from the compared run. Select a scenario to list its questions.</p>
+        </div>
+        <div class="panel">
+          <div class="panel__bar">
+            <h2 class="panel__title">Judge metrics</h2>
+            <div class="seg seg--sm" role="radiogroup" aria-label="Averaging" id="metric-seg">
+              <button type="button" role="radio" aria-checked="true" data-avg="micro">Micro</button>
+              <button type="button" role="radio" aria-checked="false" data-avg="macro">Macro</button>
+            </div>
+          </div>
+          <div id="lg-metric"></div>
+          <div class="ev-chart" id="ch-metric"></div>
+          <p class="tbl-foot">Mean judge score (1–5); bars start at 1, the lowest score.</p>
+        </div>
+      </div>
+      <div class="grid2">
+        <div class="panel">
+          <div class="panel__bar">
+            <h2 class="panel__title">Latency distribution</h2>
+            <div class="seg seg--sm" role="radiogroup" aria-label="Latency measure" id="lat-seg">
+              <button type="button" role="radio" aria-checked="true" data-lat="latency_ms">Total</button>
+              <button type="button" role="radio" aria-checked="false" data-lat="ttft_ms">First token</button>
+            </div>
+          </div>
+          <div id="lg-lat"></div>
+          <div class="ev-chart" id="ch-lat"></div>
+          <p class="tbl-foot" id="lat-foot">Questions per latency bin. Select a bin to filter the items list.</p>
+        </div>
+        <div class="panel">
+          <div class="panel__bar">
+            <h2 class="panel__title">Score vs latency</h2>
+            <button type="button" class="btn btn--sm" id="sc-reset" hidden>Reset zoom</button>
+          </div>
+          <div id="lg-scatter"></div>
+          <div class="ev-chart" id="ch-scatter"></div>
+          <p class="tbl-foot" id="scatter-foot">One point per judged question. Drag across the chart to zoom into a latency range; select a point to open the question.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ items ============ -->
+    <section id="items" class="sec" aria-labelledby="items-h">
+      <div class="sec__head">
+        <div>
+          <h1 id="items-h" class="sec__title">Items</h1>
+          <p class="sec__lede" id="items-lede">Every question of the selected run. Select one to see the answer, its sources and the judge's reasoning.</p>
+        </div>
+        <div class="filters">
+          <label class="sr-only" for="f-scenario">Scenario</label>
+          <select id="f-scenario" class="select"><option value="">All scenarios</option></select>
+          <label class="sr-only" for="f-text">Filter</label>
+          <input id="f-text" class="input" type="search" placeholder="Filter by id or question…">
+          <label class="check"><input type="checkbox" id="f-failed"> Failed only</label>
+        </div>
+      </div>
+      <div class="items-layout">
+        <div class="tbl-scroll tbl-scroll--items" tabindex="0" role="region" aria-label="Items">
+          <table class="tbl tbl--items" id="items-table">
+            <thead><tr>
+              <th scope="col">Item</th><th scope="col">Question</th><th scope="col" class="r">Score</th>
+              <th scope="col" class="r" id="items-delta-h" hidden>Δ</th><th scope="col">Result</th><th scope="col" class="r">s</th>
+            </tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+        <article class="detail panel" id="detail" aria-live="polite">
+          <p class="muted">Select an item.</p>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="chart-tip" id="tip" role="tooltip" hidden></div>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+</body>
+</html>

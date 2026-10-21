@@ -1,0 +1,62 @@
+{
+  "data/preprints/test_1802.04062_point_defects.pdf": {
+    "status": "parsed",
+    "output": "extracted/preprints/test_1802.04062_point_defects/test_1802.04062_point_defects.json",
+    "doc_id": "doc_a54d19cd294d",
+    "pages": 22,
+    "elements": 319,
+    "counts_by_type": {
+      "text": 198,
+      "formula": 78,
+      "footer": 23,
+      "list": 7,
+      "footnote": 5,
+      "chart": 5,
+      "header": 1,
+      "watermark": 1,
+      "image": 1
+    },
+    "warnings": 2,
+    "seconds": 213.4,
+    "figures_described": 6
+  },
+  "data/preprints/25_arXiv_2311.10205.pdf": {
+    "status": "parsed",
+    "output": "extracted/preprints/25_arXiv_2311.10205/25_arXiv_2311.10205.json",
+    "doc_id": "doc_43d092b6d671",
+    "pages": 25,
+    "elements": 85,
+    "counts_by_type": {
+      "text": 73,
+      "image": 6,
+      "list": 3,
+      "table": 2,
+      "footnote": 1
+    },
+    "warnings": 0,
+    "seconds": 89.8,
+    "figures_described": 6
+  },
+  "data/textbooks/Materials Science and Engineering.pdf": {
+    "status": "parsed",
+    "output": "extracted/textbooks/Materials_Science_and_Engineering/Materials_Science_and_Engineering.json",
+    "doc_id": "doc_f49a86e05ec4",
+    "pages": 211,
+    "elements": 1884,
+    "counts_by_type": {
+      "text": 1112,
+      "formula": 429,
+      "footer": 177,
+      "image": 98,
+      "chart": 33,
+      "list": 18,
+      "table_of_contents": 8,
+      "table": 4,
+      "logo": 3,
+      "link": 2
+    },
+    "warnings": 22,
+    "seconds": 1542.9,
+    "figures_described": 129
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "embed_model": "Qwen/Qwen3-Embedding-0.6B",
+  "target_tokens": 400,
+  "max_tokens": 600,
+  "overlap_tokens": 60,
+  "total_chunks": 375,
+  "by_type": {
+    "text": 241,
+    "figure": 130,
+    "table": 4
+  },
+  "tokens": {
+    "min": 41,
+    "median": 217,
+    "p95": 400,
+    "max": 505,
+    "total": 90540
+  },
+  "documents": {
+    "Materials Science and Engineering.pdf": {
+      "chunks": 375,
+      "by_type": {
+        "text": 241,
+        "figure": 130,
+        "table": 4
+      }
+    }
+  }
+}

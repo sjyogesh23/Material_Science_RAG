@@ -1,0 +1,263 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Audit v2 self-test</title>
+<style>body{background:#000;color:#fff;font:14px monospace;margin:0} iframe{border:0;display:block;background:#15191D}
+#out{white-space:pre-wrap;padding:8px}</style></head><body>
+<iframe id="f" width="__W__" height="__H__"></iframe><pre id="out">running</pre>
+<script>
+const out = {errors: [], checks: {}};
+const f = document.getElementById("f");
+const wait = (ms) => { fetch("/__log", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(out)}); return fetch("/__sleep?ms=" + ms).then(r => r.text()); };
+const until = async (fn, ms = 20000) => { for (let i = 0; i < ms / 150; i++) { try { if (fn()) return true; } catch {} await wait(150); } return false; };
+function hook(w) {
+  w.addEventListener("error", e => out.errors.push("error: " + e.message + " @" + (e.filename||"") + ":" + e.lineno));
+  w.addEventListener("unhandledrejection", e => out.errors.push("rejection: " + (e.reason && e.reason.stack || e.reason)));
+  const ce = w.console.error.bind(w.console); w.console.error = (...a) => { out.errors.push("console.error: " + a.join(" ")); ce(...a); };
+}
+async function load(url) {
+  f.src = url;
+  await new Promise(r => f.onload = r);
+  hook(f.contentWindow);
+  return f.contentDocument;
+}
+const click = (el) => el.dispatchEvent(new f.contentWindow.MouseEvent("click", {bubbles: true}));
+const hover = (el) => { const r = el.getBoundingClientRect(); el.dispatchEvent(new f.contentWindow.PointerEvent("pointermove", {bubbles: true, clientX: r.left + r.width / 2, clientY: r.top + r.height / 2})); };
+const input = (el, v) => { el.value = v; el.dispatchEvent(new f.contentWindow.Event("input", {bubbles: true})); };
+
+(async () => {
+  const mode = "__MODE__", act = "__ACT__";
+  const C = out.checks;
+  let d;
+  if (mode === "usage") {
+    d = await load("/audit#usage");
+    C.kpi_loaded = await until(() => d.querySelector('[data-k="total"]').textContent !== "–");
+    C.day_bars = d.querySelectorAll("#day-chart .cv-bar").length;
+    C.purpose_rows = d.querySelectorAll("#purpose-chart .cv-row").length;
+    C.model_rows = d.querySelectorAll("#model-chart .cv-row").length;
+    C.mode_rows = d.querySelectorAll("#mode-chart .cv-row").length;
+    C.lat_bars = d.querySelectorAll("#lat-chart .cv-bar").length;
+    C.keys_tab_gone = !d.querySelector('a[href="#keys"]') && !d.getElementById("keys");
+    // tooltip
+    const hit = [...d.querySelectorAll("#day-chart .cv-hit")].reverse().find(h => h.closest("g").querySelector(".cv-bar"));
+    hover(hit);
+    const tip = d.querySelector(".cv-tip");
+    C.tooltip = tip && !tip.hidden ? tip.textContent.slice(0, 80) : false;
+    // click a day -> calls filtered to that day
+    const day = hit.dataset.hit;
+    click(hit);
+    await wait(100);
+    const rows = [...d.querySelectorAll("#calls-table tbody tr")];
+    C.day_filter_chip = d.querySelector("#active-filters .chip")?.textContent;
+    C.day_filter_rows = rows.length;
+    C.day_selected = d.querySelectorAll("#day-chart .cv-col.is-sel").length;
+    // purpose click
+    const ph = d.querySelector('#purpose-chart .cv-hit[data-hit="answer"]');
+    click(ph); await wait(100);
+    C.purpose_filter_select = d.getElementById("f-purpose").value;
+    C.chips = [...d.querySelectorAll("#active-filters .chip")].map(c => c.textContent);
+    C.purposes_in_table = [...new Set([...d.querySelectorAll("#calls-table tbody tr td:nth-child(3)")].map(t => t.textContent))];
+    // clear all
+    click(d.querySelector('#active-filters [data-clear="*"]')); await wait(100);
+    C.after_clear_rows = d.querySelectorAll("#calls-table tbody tr").length;
+    // mode filter via chart
+    click(d.querySelector('#mode-chart .cv-hit[data-hit="deep"]')); await wait(100);
+    C.mode_select = d.getElementById("f-mode").value;
+    C.mode_table_modes = [...new Set([...d.querySelectorAll("#calls-table tbody tr td:nth-child(4)")].map(t => t.textContent.trim()))];
+    click(d.querySelector('#mode-chart .cv-hit[data-hit="deep"]')); await wait(100);
+    // latency click
+    const lh = [...d.querySelectorAll("#lat-chart .cv-hit")].find(h => h.closest("g").querySelector(".cv-bar"));
+    click(lh); await wait(100);
+    C.lat_chip = d.querySelector("#active-filters .chip")?.textContent;
+    C.lat_rows = d.querySelectorAll("#calls-table tbody tr").length;
+    click(lh); await wait(100);
+    // legend toggle
+    const before = d.querySelectorAll("#day-chart .cv-bar").length;
+    click(d.querySelector("#day-legend .cv-legend__item"));
+    await wait(100);
+    C.legend_toggle = before + " -> " + d.querySelectorAll("#day-chart .cv-bar").length + " pressed=" + d.querySelector("#day-legend .cv-legend__item").getAttribute("aria-pressed");
+    click(d.querySelector("#day-legend .cv-legend__item")); await wait(100);
+    // range
+    click(d.querySelector('#days [data-days="7"]'));
+    await until(() => d.querySelectorAll("#day-chart .cv-col").length === 7);
+    C.range7_cols = d.querySelectorAll("#day-chart .cv-col").length;
+    C.total_sub = d.querySelector('[data-k="total-sub"]').textContent;
+    // sort
+    click(d.querySelector('#calls-table th[data-sort="duration_ms"] button')); await wait(50);
+    C.sorted = d.querySelector('#calls-table th[data-sort="duration_ms"]').getAttribute("aria-sort");
+    const ms = [...d.querySelectorAll("#calls-table tbody tr td:nth-child(9)")].slice(0, 5).map(t => +t.textContent.replace(/,/g, ""));
+    C.sorted_desc = ms.every((v, i) => i === 0 || v <= ms[i - 1]);
+  } else if (mode === "feedback") {
+    d = await load("/audit#feedback");
+    C.loaded = await until(() => d.querySelectorAll("#fb-list .fb").length > 0);
+    C.likes = d.querySelector('[data-f="likes"]').textContent;
+    C.dislikes = d.querySelector('[data-f="dislikes"]').textContent;
+    C.gauge = d.querySelector("#fb-gauge .cv-center")?.textContent;
+    C.day_bars = d.querySelectorAll("#fb-day-chart .cv-bar").length;
+    C.mode_rows = d.querySelectorAll("#fb-mode-chart .cv-row").length;
+    C.intent_rows = d.querySelectorAll("#fb-intent-chart .cv-row").length;
+    C.items = d.querySelectorAll("#fb-list .fb").length;
+    C.rendered_md = d.querySelectorAll("#fb-list .fb__prose table, #fb-list .fb__prose .katex").length > 0;
+    C.sources_blocks = d.querySelectorAll("#fb-list .fb__sources").length;
+    C.reviewed_before = d.querySelectorAll("#fb-list .issue").length;
+    click(d.getElementById("fb-review"));
+    C.reviewing_label = d.getElementById("fb-review").textContent;
+    await until(() => !d.getElementById("fb-review").disabled);
+    C.reviewed_after = d.querySelectorAll("#fb-list .issue").length;
+    C.issue_types = [...new Set([...d.querySelectorAll("#fb-list .issue")].map(x => x.textContent))];
+    C.toast = d.getElementById("toast").textContent;
+    C.fix_text = !!d.querySelector(".review__fix");
+    // intent filter
+    const ih = d.querySelector("#fb-intent-chart .cv-hit");
+    click(ih); await wait(100);
+    C.intent_chip = d.querySelector("#fb-filters .chip")?.textContent;
+    C.intent_items = d.querySelectorAll("#fb-list .fb").length;
+    click(d.querySelector("#fb-filters .chip")); await wait(100);
+    // show more
+    const more = d.querySelector(".fb__more:not([hidden])");
+    if (more) { click(more); C.show_more = more.getAttribute("aria-expanded"); }
+  } else if (mode === "arch") {
+    d = await load("/audit#architecture");
+    C.loaded = await until(() => d.querySelectorAll(".flow__node").length > 0);
+    C.nodes = d.querySelectorAll(".flow__node").length;
+    C.edges = d.querySelectorAll(".flow__edge").length;
+    C.back_edges = d.querySelectorAll(".flow__edge--back").length;
+    C.groups = d.querySelectorAll(".flow__group").length;
+    C.stats_texts = [...d.querySelectorAll(".flow__stat")].map(t => t.textContent).slice(0, 3);
+    const svg = d.querySelector(".flow");
+    C.svg_size = svg.getAttribute("width") + "x" + svg.getAttribute("height");
+    // overlap check
+    const boxes = [...d.querySelectorAll(".flow__box")].map(r => [+r.getAttribute("x"), +r.getAttribute("y"), +r.getAttribute("width"), +r.getAttribute("height")]);
+    let ov = 0; for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) { const [a, b] = [boxes[i], boxes[j]]; if (a[0] < b[0] + b[2] && b[0] < a[0] + a[2] && a[1] < b[1] + b[3] && b[1] < a[1] + a[3]) ov++; }
+    C.overlaps = ov;
+    C.within_width = boxes.every(b => b[0] >= 0 && b[0] + b[2] <= +svg.getAttribute("width"));
+    // select the prompt builder
+    click(d.querySelector('.flow__node[data-node="prompt_builder"]'));
+    C.comps_loaded = await until(() => d.querySelectorAll("#side-comps .comp .comp__editor").length === 3);
+    C.side_title = d.querySelector(".side__title").textContent;
+    const sec = d.querySelector('.comp[data-comp="answer_system_prompt"]');
+    C.versions_before = sec.querySelectorAll(".vrow").length;
+    C.active_badge = sec.querySelector(".comp__head .vbadge").textContent;
+    // edit + save
+    const ta = sec.querySelector("textarea");
+    input(ta, ta.value + "\n7. Harness rule.");
+    C.dirty = sec.classList.contains("is-dirty");
+    sec.querySelector("input.input").value = "harness edit";
+    click(sec.querySelector("[data-save]"));
+    await until(() => d.querySelector('.comp[data-comp="answer_system_prompt"]').querySelectorAll(".vrow").length === C.versions_before + 1);
+    const sec2 = d.querySelector('.comp[data-comp="answer_system_prompt"]');
+    C.versions_after = sec2.querySelectorAll(".vrow").length;
+    C.active_after = sec2.querySelector(".comp__head .vbadge").textContent;
+    C.top_note = sec2.querySelector(".vrow .vrow__note").textContent;
+    // diff vs active (v1)
+    click(sec2.querySelector('[data-diff="1"]'));
+    await until(() => sec2.querySelector(".comp__diff"));
+    C.diff_add = sec2.querySelectorAll(".comp__diff .d-add").length;
+    C.diff_del = sec2.querySelectorAll(".comp__diff .d-del").length;
+    // view v1
+    click(sec2.querySelector('[data-viewv="1"]'));
+    await until(() => sec2.querySelector(".comp__pre:not(.comp__diff)"));
+    C.view_v1 = sec2.querySelector(".comp__viewbar strong").textContent;
+    // activate v1 -> confirm dialog
+    click(sec2.querySelector('[data-activate="1"]'));
+    await wait(100);
+    C.dialog_open = d.getElementById("confirm-dlg").open;
+    C.dialog_title = d.getElementById("confirm-title").textContent;
+    click(d.getElementById("confirm-ok"));
+    await until(() => d.querySelector('.comp[data-comp="answer_system_prompt"] .comp__head .vbadge').textContent === "v1 active");
+    C.active_after_activate = d.querySelector('.comp[data-comp="answer_system_prompt"] .comp__head .vbadge').textContent;
+    // cancel path
+    click(d.querySelector('.comp[data-comp="answer_system_prompt"] [data-activate="3"]'));
+    await wait(100);
+    click(d.getElementById("confirm-cancel"));
+    await wait(200);
+    C.cancel_kept = d.querySelector('.comp[data-comp="answer_system_prompt"] .comp__head .vbadge').textContent;
+    // form_notes text map
+    const fn = d.querySelector('.comp[data-comp="form_notes"]');
+    C.form_notes_fields = fn.querySelectorAll("[data-tk]").length;
+    // retrieval params validation on rerank node
+    click(d.querySelector('.flow__node[data-node="rerank"]'));
+    await until(() => d.querySelector('.comp[data-comp="retrieval_params"] [data-pk]'));
+    const rp = d.querySelector('.comp[data-comp="retrieval_params"]');
+    C.params_fields = rp.querySelectorAll("[data-pk]").length;
+    const th = rp.querySelector('[data-pk="ooc_threshold"]');
+    input(th, "2");
+    C.param_error = rp.querySelector(`#${CSS.escape(th.id)}-e`).textContent;
+    click(rp.querySelector("[data-save]")); await wait(100);
+    C.param_save_blocked = rp.querySelector(".comp__err").textContent;
+    input(th, "0.3");
+    click(rp.querySelector('[data-view="raw"]')); await wait(50);
+    C.raw_has_value = rp.querySelector("textarea").value.includes('"ooc_threshold": 0.3');
+    input(rp.querySelector("textarea"), '{"rrf_k": 60,');
+    C.json_error = rp.querySelector(".comp__jsonmsg").textContent;
+    input(rp.querySelector("textarea"), '{"rrf_k": 60, "final_k": 6}');
+    click(rp.querySelector("[data-save]"));
+    await until(() => d.querySelector('.comp[data-comp="retrieval_params"] .comp__head .vbadge').textContent === "v2 active");
+    C.params_saved = d.querySelector('.comp[data-comp="retrieval_params"] .comp__head .vbadge').textContent;
+    // modes JSON on llm node
+    C.dirty_before_llm = [...d.querySelectorAll(".comp.is-dirty")].map(x => x.dataset.comp).join(",") + "|dlg=" + d.getElementById("confirm-dlg").open;
+    click(d.querySelector('.flow__node[data-node="llm"]'));
+    await wait(100);
+    C.dlg_after_llm = d.getElementById("confirm-dlg").open + " " + d.getElementById("confirm-text").textContent;
+    await until(() => d.querySelector('.comp[data-comp="modes"] textarea'));
+    const md = d.querySelector('.comp[data-comp="modes"]');
+    input(md.querySelector("textarea"), "[]");
+    C.modes_error = md.querySelector(".comp__jsonmsg").textContent;
+    // dirty-switch guard
+    click(d.querySelector('.flow__node[data-node="router"]'));
+    await wait(100);
+    C.dirty_guard = d.getElementById("confirm-dlg").open;
+    click(d.getElementById("confirm-ok"));
+    await until(() => d.querySelector(".side__title").textContent.includes("router"));
+    C.switched = d.querySelector(".side__title").textContent;
+    // node tooltip
+    hover(d.querySelector('.flow__node[data-node="router"]'));
+    C.node_tip = d.querySelector(".cv-tip").textContent.slice(0, 60);
+  } else if (mode === "settings") {
+    d = await load("/audit#keys");
+    C.redirected_to_settings = await until(() => !d.getElementById("settings").hidden && d.querySelectorAll("#settings-fields [data-key]").length > 5);
+    C.fields = d.querySelectorAll("#settings-fields [data-key]").length;
+    C.no_keys_ui = !d.getElementById("key-form") && !d.getElementById("keys-table");
+    const t = d.getElementById("s-temperature"); t.value = "0.2";
+    click(d.getElementById("settings-save"));
+    await until(() => /^(Saved|Not)/.test(d.getElementById("settings-msg").textContent));
+    C.settings_msg = d.getElementById("settings-msg").textContent;
+  } else {
+    // screenshot mode: mode = url path (with hash); act = action
+    d = await load(mode);
+    await until(() => d.querySelector(".cv, .flow, .group"), 10000);
+    await wait(600);
+    if (act.startsWith("node:")) {
+      click(d.querySelector(`.flow__node[data-node="${act.slice(5)}"]`));
+      await until(() => d.querySelector("#side-comps .comp__editor") || d.querySelector(".side__none"));
+      await wait(400);
+    }
+    if (act === "diff") {
+      click(d.querySelector('.flow__node[data-node="prompt_builder"]'));
+      await until(() => d.querySelector('.comp[data-comp="answer_system_prompt"] [data-diff="1"]'));
+      click(d.querySelector('.comp[data-comp="answer_system_prompt"] [data-diff="1"]'));
+      await until(() => d.querySelector(".comp__diff"));
+      d.querySelector(".arch__side").scrollTop = 0;
+      d.querySelector(".comp__view").scrollIntoView({block: "center"});
+      f.contentWindow.scrollTo(0, 0);
+    }
+    if (act === "confirm") {
+      click(d.querySelector('.flow__node[data-node="prompt_builder"]'));
+      await until(() => d.querySelector('.comp[data-comp="answer_system_prompt"] [data-activate="1"]'));
+      click(d.querySelector('.comp[data-comp="answer_system_prompt"] [data-activate="1"]'));
+    }
+    if (act === "dayfilter") {
+      const hit = [...d.querySelectorAll("#day-chart .cv-hit")].reverse().find(h => h.closest("g").querySelector(".cv-bar"));
+      click(hit); await wait(400); hover(d.querySelector('#purpose-chart .cv-hit[data-hit="answer"]'));
+    }
+    if (act === "tip") { hover([...d.querySelectorAll("#day-chart .cv-hit")].reverse().find(h => h.closest("g").querySelector(".cv-bar"))); }
+    if (act === "reviewed") { click(d.getElementById("fb-review")); await until(() => !d.getElementById("fb-review").disabled); d.getElementById("fb-list").scrollIntoView(); }
+    if (act === "scroll") { f.contentWindow.scrollTo(0, 99999); }
+    if (act === "params") {
+      click(d.querySelector('.flow__node[data-node="rerank"]'));
+      await until(() => d.querySelector('.comp[data-comp="retrieval_params"] [data-pk]'));
+      const th = d.querySelector('[data-pk="ooc_threshold"]'); input(th, "1.5");
+    }
+    await wait(500);
+    C.side = (d.getElementById("arch-side") || {}).textContent?.replace(/\s+/g, " ").slice(0, 400);
+  }
+  document.getElementById("out").textContent = "RESULT " + JSON.stringify(out, null, 1);
+})().catch(e => { out.errors.push("harness: " + e.stack); document.getElementById("out").textContent = "RESULT " + JSON.stringify(out, null, 1); });
+</script></body></html>

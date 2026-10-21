@@ -1,0 +1,59 @@
+/* Shared inline-SVG chart styles (js/charts.js). Dark "tempered steel" surfaces. */
+:root {
+  --cv-1: #3987e5; --cv-2: #d95926; --cv-3: #199e70; --cv-4: #c98500;
+  --cv-5: #d55181; --cv-6: #008300; --cv-7: #9085e9; --cv-8: #e66767;
+  --cv-empty: rgb(255 255 255 / .035);
+}
+.cv { display: block; max-width: 100%; overflow: visible; font-family: var(--sans); }
+.cv-grid { stroke: var(--etch); stroke-width: 1; stroke-dasharray: 2 3; }
+.cv-base { stroke: var(--faint); stroke-width: 1; }
+.cv-ax { fill: var(--faint); font-size: 11px; font-variant-numeric: tabular-nums; }
+.cv-ax.is-sel { fill: var(--straw); font-weight: 600; }
+.cv-ax--t { fill: var(--dim); }
+.cv-lab { fill: var(--dim); font-size: 12px; }
+.cv-val { fill: var(--polish); font-size: 11.5px; font-variant-numeric: tabular-nums; }
+.cv-hit { fill: transparent; cursor: default; outline: none; }
+.cv-hit[role="button"] { cursor: pointer; }
+.cv-hit:focus-visible { stroke: var(--straw); stroke-width: 1.5; }
+.cv-bar, .cv-pt, .cv-seg, .cv-cell { transition: opacity .12s; }
+.is-hover .cv-bar, .is-hover .cv-pt, .is-hover .cv-cell { filter: brightness(1.18); }
+.is-hover .cv-lab { fill: var(--polish); }
+.is-dim .cv-bar { opacity: .38; }
+.is-sel .cv-lab { fill: var(--straw); font-weight: 600; }
+.cv-col.is-hover .cv-hit { fill: rgb(255 255 255 / .04); }
+.cv-row.is-hover .cv-hit { fill: rgb(255 255 255 / .03); }
+.cv-selband { fill: var(--straw-wash); }
+.cv-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.cv-dot { stroke: var(--graphite); stroke-width: 2; }
+.cv-cross { stroke: var(--dim); stroke-width: 1; stroke-dasharray: 3 3; pointer-events: none; }
+.cv-pt { stroke: var(--graphite); stroke-width: 2; }
+.cv-track { stroke: var(--etch); }
+.cv-center { fill: var(--polish); font-size: 20px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.cv-center-sub { fill: var(--faint); font-size: 10.5px; }
+.cv-cellv { fill: var(--polish); font-size: 11px; pointer-events: none; font-variant-numeric: tabular-nums; }
+.cv-cellv.is-dark { fill: #0d1620; }
+.cv-empty { margin: 0; padding: 2.5rem 0; text-align: center; color: var(--faint); font-size: var(--fs-sm); }
+
+.cv-legend { display: flex; flex-wrap: wrap; gap: .25rem .5rem; align-items: center; font-size: var(--fs-xs); color: var(--dim); margin: 0 0 .4rem; }
+.cv-legend__item { display: inline-flex; align-items: center; gap: .4rem; padding: .15rem .45rem; border: 1px solid transparent; border-radius: var(--r-sm); background: none; color: var(--dim); font-size: var(--fs-xs); }
+button.cv-legend__item:hover { border-color: var(--etch); color: var(--polish); }
+button.cv-legend__item[aria-pressed="false"] { color: var(--faint); text-decoration: line-through; }
+button.cv-legend__item[aria-pressed="false"] .cv-legend__k { opacity: .25; }
+.cv-legend__k { display: inline-block; width: 10px; height: 10px; border-radius: 2px; }
+.cv-legend__k--line { height: 2px; width: 14px; border-radius: 1px; }
+
+.cv-tip {
+  position: fixed; left: 0; top: 0; z-index: 80; pointer-events: none;
+  padding: .5rem .65rem; min-width: 10rem; max-width: 20rem;
+  background: var(--plate); border: 1px solid var(--etch); border-radius: var(--r-md);
+  box-shadow: 0 10px 28px rgb(0 0 0 / .45); font-size: var(--fs-xs); color: var(--polish);
+}
+.cv-tip[hidden] { display: none; }
+.cv-tip p { margin: .12rem 0; }
+.cv-tip__t { font-weight: 600; margin-bottom: .3rem !important; }
+.cv-tip__r { display: flex; align-items: center; gap: .45rem; }
+.cv-tip__k { width: 12px; height: 2px; border-radius: 1px; flex: none; }
+.cv-tip__l { color: var(--dim); }
+.cv-tip__r b { margin-left: auto; padding-left: .8rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.cv-tip__f { color: var(--faint); margin-top: .35rem !important; }
+@media (forced-colors: active) { .cv-bar, .cv-seg, .cv-pt { forced-color-adjust: none; } }
